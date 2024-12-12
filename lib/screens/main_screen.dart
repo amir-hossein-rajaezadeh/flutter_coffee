@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_coffee/models/cofee_model.dart';
 import 'package:flutter_coffee/screens/detail_screen.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
 
@@ -287,13 +289,16 @@ class _MainScreenState extends State<MainScreen> {
               crossAxisSpacing: 11,
               childAspectRatio: 0.8,
             ),
-            itemCount: 4,
+            itemCount: getCoffeeList().length,
             itemBuilder: (context, index) {
+              final CoffeeModel coffeeItem = getCoffeeList()[index];
               return GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DetailScreen(),
+                    builder: (context) => DetailScreen(
+                      coffeeId: coffeeItem.coffeeId,
+                    ),
                   ),
                 ),
                 child: Card(
@@ -305,13 +310,57 @@ class _MainScreenState extends State<MainScreen> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              'assets/images/coffee_${index + 1}.png',
-                              fit: BoxFit.cover,
-                            ),
+                          padding: const EdgeInsets.all(10),
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  coffeeItem.image,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Container(
+                                  alignment: Alignment.topRight,
+                                  width: 70,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(40),
+                                      topRight: Radius.circular(14),
+                                    ),
+                                  ),
+                                  child: Container(
+                                    margin:
+                                        const EdgeInsets.only(left: 12, top: 4),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.star_rounded,
+                                          color: MyColors.yellow,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(
+                                          width: 4,
+                                        ),
+                                        Text(
+                                          coffeeItem.rate.toString(),
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -321,16 +370,16 @@ class _MainScreenState extends State<MainScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Coffee ${index + 1}',
+                              coffeeItem.coffeeName,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Container(
-                              child: const Text(
-                                'Deep Foeam',
-                                style: TextStyle(
+                              child: Text(
+                                coffeeItem.coffeeType,
+                                style: const TextStyle(
                                     color: MyColors.lightGrey,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
@@ -340,7 +389,7 @@ class _MainScreenState extends State<MainScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '\$${(index + 1) * 4}.99',
+                                  coffeeItem.price.toString(),
                                   style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),

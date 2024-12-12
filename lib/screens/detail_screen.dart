@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_coffee/screens/order_screen.dart';
 import 'package:flutter_coffee/screens/widgets/app_bar.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
+import 'package:flutter_coffee/models/cofee_model.dart';
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key});
+  final int coffeeId;
 
+  const DetailScreen({super.key, required this.coffeeId});
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
@@ -16,6 +18,8 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final coffeeItem = getCoffeeList()
+        .firstWhere((element) => element.coffeeId == widget.coffeeId);
     return Scaffold(
       backgroundColor: MyColors.background,
       body: Column(
@@ -24,13 +28,14 @@ class _DetailScreenState extends State<DetailScreen> {
           BuildAppBarWidget(
             appBarTitle: 'Detail',
             hasActionIcon: true,
+            coffeeId: coffeeItem.coffeeId,
           ),
           Container(
             margin: const EdgeInsets.only(top: 12, right: 12, left: 12),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'assets/images/coffee_3.png',
+                coffeeItem.image,
                 width: 400,
                 height: 200,
                 fit: BoxFit.cover,
@@ -43,9 +48,10 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Coffee Mocha',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  coffeeItem.coffeeName,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,21 +108,21 @@ class _DetailScreenState extends State<DetailScreen> {
                   ],
                 ),
                 Container(
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         CupertinoIcons.star_fill,
                         color: MyColors.yellow,
                       ),
                       Text(
-                        '4.8',
-                        style: TextStyle(
+                        coffeeItem.rate.toString(),
+                        style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text(
-                        ' (230)',
-                        style:
-                            TextStyle(color: MyColors.lightGrey, fontSize: 12),
+                        ' (${coffeeItem.commentCount})',
+                        style: const TextStyle(
+                            color: MyColors.lightGrey, fontSize: 12),
                       )
                     ],
                   ),
@@ -137,9 +143,9 @@ class _DetailScreenState extends State<DetailScreen> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Container(
-                        child: const Text(
-                          'A cappuccino is an approximately 150 ml (5 oz) beverage, with 25 ml of espresso coffee and 85ml of fresh milk the A cappuccino is an approximately 150 ml (5 oz) beverage, wit for...',
-                          style: TextStyle(
+                        child: Text(
+                          coffeeItem.desc,
+                          style: const TextStyle(
                               color: MyColors.lightGrey, fontSize: 16),
                         ),
                       ),
@@ -287,10 +293,10 @@ class _DetailScreenState extends State<DetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Price',
                             style: TextStyle(
                                 color: MyColors.lightGrey,
@@ -298,8 +304,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                 fontWeight: FontWeight.w600),
                           ),
                           Text(
-                            '\$4.53',
-                            style: TextStyle(
+                            '\$${coffeeItem.price}',
+                            style: const TextStyle(
                                 color: MyColors.brown,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold),
@@ -312,7 +318,9 @@ class _DetailScreenState extends State<DetailScreen> {
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => OrderListScreen(),
+                              builder: (context) => OrderListScreen(
+                                coffeeId: coffeeItem.coffeeId,
+                              ),
                             )),
                         child: Container(
                           margin: const EdgeInsets.only(left: 40),

@@ -10,6 +10,7 @@ class MyColors {
   static const Color mediumWhite = Color(0xFFEDEDED);
   static const Color background = Color(0xFFF9F9F9);
   static const Color deviderColor = Color(0xFFE3E3E3);
+  static const Color greenColor = Color(0xFF36C07E);
 
   static const List<Color> gradiuntListColor = [black, mediumGrey];
 }
