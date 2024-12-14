@@ -1,20 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_coffee/models/cofee_model.dart';
+import 'package:flutter_coffee/models/coffee_model_rm.dart';
 import 'package:lottie/lottie.dart';
 import '../../cubit/cubit/app_cubit.dart';
 import '../../cubit/cubit/app_state.dart';
 
 class BuildAppBarWidget extends StatelessWidget {
-  const BuildAppBarWidget(
-      {super.key,
-      required this.appBarTitle,
-      required this.hasActionIcon,
-      required this.coffeeId});
+  const BuildAppBarWidget({
+    super.key,
+    required this.appBarTitle,
+    required this.hasActionIcon,
+  });
   final bool hasActionIcon;
   final String appBarTitle;
-  final int coffeeId;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,39 +25,34 @@ class BuildAppBarWidget extends StatelessWidget {
               padding: const EdgeInsets.only(right: 20),
               child: BlocBuilder<AppCubit, AppState>(
                 builder: (context, state) {
-                  final CoffeeModel coffeeItem = state.coffeeList
-                      .firstWhere((element) => element.coffeeId == coffeeId);
+                  final CoffeeModelRM coffeeItem = state.coffeeItem;
                   print(coffeeItem);
                   return Container(
                     margin: const EdgeInsets.only(top: 8),
                     alignment: Alignment.topRight,
                     child: GestureDetector(
                       onTap: () {
-                        print('likedAnim Called');
-                        context.read<AppCubit>().likeItem(coffeeItem.coffeeId);
+                        // context.read<AppCubit>().likeItem(index);
                       },
                       child: Stack(
-                        alignment: Alignment.center,
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(left: 0, top: 0),
+                            margin: const EdgeInsets.only(left: 13, top: 12),
                             child: Icon(
-                              coffeeItem.isLiked
+                              coffeeItem.isLiked == 1
                                   ? CupertinoIcons.heart_fill
                                   : CupertinoIcons.heart,
-                              size: 24,
-                              color: Colors.red,
+                              color: Colors.black,
                             ),
                           ),
-                          if (state.showLikeAnim && coffeeItem.isLiked)
-                            Lottie.asset('assets/animations/like.json',
+                          if (state.showLikeAnim && coffeeItem.isLiked == 1)
+                            Lottie.asset('assets/animations/like_anim.json',
                                 onLoaded: (p0) async {
                               await Future.delayed(
                                 const Duration(seconds: 1),
                               );
                               context.read<AppCubit>().setShowLikeAnim(false);
                             },
-                            
                                 repeat: false,
                                 width: 50,
                                 height: 50,

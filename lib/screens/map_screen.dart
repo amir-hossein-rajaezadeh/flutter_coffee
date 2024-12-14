@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_coffee/utils/my_colors.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:lottie/lottie.dart' as lottie;
+import 'package:http/http.dart' as http;
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -14,18 +14,50 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final LatLng coffeeLocation = LatLng(40.6859, -73.9802);
-  // Stumptown Coffee Roasters
   final LatLng homeLocation = LatLng(40.687983761053765, -73.9787030889008);
-  //Home
+  final MapController _mapController = MapController();
   List<LatLng> route = [];
-  List<LatLng> routePoints = [];
+  LatLng? animatedBikePosition;
+  int currentPointIndex = 0;
+
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _getRoute(); // Fetch route when the app starts
+    _getRoute();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5), // Speed of the bike
+    );
+
+    _animationController.addListener(() {
+      setState(() {
+        if (route.isNotEmpty && currentPointIndex < route.length - 1) {
+          final start = route[currentPointIndex];
+          final end = route[currentPointIndex + 1];
+          animatedBikePosition = LatLng(
+            start.latitude + (end.latitude - start.latitude) * _animation.value,
+            start.longitude +
+                (end.longitude - start.longitude) * _animation.value,
+          );
+        }
+      });
+    });
+
+    _animationController.addStatusListener((status) {
+      
+      if (status == AnimationStatus.completed &&
+          currentPointIndex < route.length - 1) {
+        currentPointIndex++;
+        _animationController.reset();
+        _animationController.forward();
+      }
+    });
   }
 
   Future<void> _getRoute() async {
@@ -41,15 +73,25 @@ class _MapScreenState extends State<MapScreen> {
           data['features'][0]['geometry']['coordinates'];
       setState(() {
         route = coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
+        animatedBikePosition = route.first;
       });
+
+      _animation = Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.linear),
+      );
+
+      _animationController.forward();
     } else {
       print('Failed to fetch route: ${response.body}');
-
       throw Exception('Failed to load route');
     }
   }
 
-  final MapController _mapController = MapController();
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,40 +115,54 @@ class _MapScreenState extends State<MapScreen> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      width: 80.0,
-                      height: 80.0,
+                      width: 120.0,
+                      height: 170.0,
                       point: coffeeLocation,
-                      builder: (ctx) => const Icon(
-                          CupertinoIcons.location_solid,
-                          color: MyColors.brown,
-                          size: 40),
+                      builder: (ctx) => Container(
+                        margin: const EdgeInsets.only(bottom: 47),
+                        child: lottie.Lottie.asset(
+                            "assets/animations/store_anim.json",
+                            fit: BoxFit.cover),
+                      ),
                     ),
                     Marker(
-                      width: 50.0,
-                      height: 50.0,
+                      width: 50,
+                      height: 100.0,
                       point: homeLocation,
                       builder: (ctx) => Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Colors.white,
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black,
-                              blurRadius: 4.5,
-                              spreadRadius: 2.2,
-                              offset: Offset(1.0, 1.0),
-                            )
-                          ],
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey.withOpacity(0.6),
                         ),
-                        child: Center(
-                            child: Image.asset(
-                          'assets/icons/bike_right.png',
-                          fit: BoxFit.cover,
-                          width: 30,
-                          height: 30,
-                        )),
+                        margin: const EdgeInsets.only(bottom: 48),
+                        child: lottie.Lottie.asset(
+                            "assets/animations/location_anim.json"),
                       ),
                     ),
+                    if (animatedBikePosition != null)
+                      Marker(
+                        width: 45,
+                        height: 45,
+                        point: animatedBikePosition!,
+                        builder: (ctx) => Container(
+                          decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  spreadRadius: 8,
+                                  blurRadius: 7,
+                                  offset: const Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(100),
+                              color: Colors.white),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3),
+                            child: Image.asset("assets/icons/bike_right.png"),
+                          ),
+                        ),
+                      )
                   ],
                 ),
                 PolylineLayer(
@@ -114,15 +170,15 @@ class _MapScreenState extends State<MapScreen> {
                     Polyline(
                       points: route,
                       strokeWidth: 4.0,
-                      color: Colors.blue,
+                      color: MyColors.brown,
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          _buildBottomSheetWidget(),
-          _buildAppBarWidget(context)
+          _buildAppBarWidget(context),
+          _buildBottomSheetWidget()
         ],
       ),
     );
@@ -137,7 +193,6 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              print('Back Called');
               Navigator.pop(context);
             },
             child: Container(
@@ -156,7 +211,6 @@ class _MapScreenState extends State<MapScreen> {
           ),
           GestureDetector(
             onTap: () {
-              print('called location');
               _mapController.move(
                 coffeeLocation,
                 16,
@@ -183,172 +237,170 @@ class _MapScreenState extends State<MapScreen> {
 
   Widget _buildBottomSheetWidget() {
     return Container(
-      child: Container(
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(26),
-              topRight: Radius.circular(26),
-            ),
-            color: Colors.white),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 18),
-                alignment: Alignment.center,
-                width: 45,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: MyColors.deviderColor),
-                height: 5,
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 20),
-              child: const Text(
-                '10 minutes left',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Deliver To  ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.deviderColor,
-                        fontSize: 12),
-                  ),
-                  Text(
-                    'Jl. Kpg Sutoyo',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            Container(
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(26),
+            topRight: Radius.circular(26),
+          ),
+          color: Colors.white),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 18),
               alignment: Alignment.center,
-              margin: const EdgeInsets.only(top: 20, right: 20, left: 20),
-              height: 5,
-              width: double.infinity,
-              child: ListView.builder(
-                itemCount: 4,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 20),
-                    height: 1,
-                    width: 71,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: MyColors.greenColor),
-                  );
-                },
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(right: 40, left: 20, top: 20),
-              width: double.infinity,
+              width: 45,
               decoration: BoxDecoration(
-                border: Border.all(color: MyColors.deviderColor),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(right: 20, left: 14),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: MyColors.deviderColor),
-                      ),
-                      child: Image.asset(
-                        'assets/icons/bike.png',
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 20, top: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Deliver Your order',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 6, bottom: 8),
-                            width: 220,
-                            child: const Text(
-                              'We will deliver your goods to you in the shortes possible time.',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
+                  borderRadius: BorderRadius.circular(12),
+                  color: MyColors.deviderColor),
+              height: 5,
             ),
-            Container(
-              margin: const EdgeInsets.only(
-                  top: 20, right: 35, left: 20, bottom: 28),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 20),
+            child: const Text(
+              '10 minutes left',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Deliver To  ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: MyColors.deviderColor,
+                      fontSize: 12),
+                ),
+                Text(
+                  'Jl. Kpg Sutoyo',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(top: 20, right: 20, left: 20),
+            height: 5,
+            width: double.infinity,
+            child: ListView.builder(
+              itemCount: 4,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  height: 1,
+                  width: 71,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: MyColors.greenColor),
+                );
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(right: 40, left: 20, top: 20),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border.all(color: MyColors.deviderColor),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Container(
+              margin: const EdgeInsets.only(right: 20, left: 14),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset('assets/images/profile.png'),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 20),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Brooklyn Simmons',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                            Text(
-                              'Personal Courier',
-                              style: TextStyle(
-                                  color: MyColors.lightGrey, fontSize: 12),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: MyColors.deviderColor),
+                    ),
+                    child: Image.asset(
+                      'assets/icons/bike.png',
+                    ),
                   ),
                   Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: MyColors.lightGrey)),
-                    child: const Center(
-                      child: Icon(CupertinoIcons.phone),
+                    margin: const EdgeInsets.only(left: 20, top: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Deliver Your order',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 6, bottom: 8),
+                          width: 220,
+                          child: const Text(
+                            'We will deliver your goods to you in the shortes possible time.',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w300, fontSize: 12),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 ],
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+          Container(
+            margin:
+                const EdgeInsets.only(top: 20, right: 35, left: 20, bottom: 28),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset('assets/images/profile.png'),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 20),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Brooklyn Simmons',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          Text(
+                            'Personal Courier',
+                            style: TextStyle(
+                                color: MyColors.lightGrey, fontSize: 12),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: MyColors.lightGrey)),
+                  child: const Center(
+                    child: Icon(CupertinoIcons.phone),
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
       ),
     );
   }

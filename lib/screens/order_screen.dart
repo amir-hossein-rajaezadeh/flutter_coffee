@@ -30,10 +30,9 @@ class OrderListScreen extends StatelessWidget {
         initialIndex: 0,
         child: Column(
           children: [
-            BuildAppBarWidget(
+            const BuildAppBarWidget(
               appBarTitle: 'Order',
               hasActionIcon: false,
-              coffeeId: coffeeId,
             ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 22),
@@ -364,7 +363,13 @@ class OrderListScreen extends StatelessWidget {
                                               ),
                                               Text(
                                                 '\$1.0',
-                                                style: TextStyle(fontSize: 14),
+                                                style: TextStyle(
+                                                    decoration: TextDecoration
+                                                        .lineThrough,
+                                                    decorationColor:
+                                                        Colors.grey,
+                                                    decorationThickness: 2.0,
+                                                    fontSize: 14),
                                               )
                                             ],
                                           )
