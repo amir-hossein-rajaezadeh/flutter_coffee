@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/models/coffee_model_rm.dart';
-import 'package:flutter_coffee/screens/detail_screen.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
-
+import 'package:go_router/go_router.dart';
 import '../cubit/cubit/app_state.dart';
 import 'widgets/loading_widget.dart';
 
@@ -325,14 +324,8 @@ class _MainScreenState extends State<MainScreen> {
                                 final CoffeeModelRM coffeeItem =
                                     state.coffeeList[index];
                                 return GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailScreen(
-                                        coffeeId: coffeeItem.id!,
-                                      ),
-                                    ),
-                                  ),
+                                  onTap: () => context.push("/detail",
+                                      extra: coffeeItem.id),
                                   child: Card(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),

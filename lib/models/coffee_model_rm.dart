@@ -95,7 +95,7 @@ class CoffeeModelRM {
     _coffeeType = json['coffeeType'];
     _rate = json['rate'];
     _commentCount = json['commentCount'];
-    _image = ('http://0.0.0.0:8000/' + json['image']).replaceFirst(
+    _image = ('http://0.0.0.0:8765/' + json['image']).replaceFirst(
       '//u',
       '/u',
     );

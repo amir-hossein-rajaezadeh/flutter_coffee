@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/models/coffee_model_rm.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import '../../cubit/cubit/app_cubit.dart';
 import '../../cubit/cubit/app_state.dart';
@@ -75,10 +76,7 @@ class BuildAppBarWidget extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-            print('called');
-          },
+          onTap: () => context.pop(),
           child: const Icon(
             Icons.arrow_back_ios_new,
             size: 18,

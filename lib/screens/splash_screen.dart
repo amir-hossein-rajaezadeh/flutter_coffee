@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_coffee/screens/main_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
+import 'package:flutter_coffee/cubit/cubit/app_state.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
-
+ 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -46,28 +47,31 @@ class SplashScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          GestureDetector(
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MainScreen(),
-                )),
-            child: Container(
-              margin: const EdgeInsets.only(right: 24, left: 23, top: 24),
-              height: 56,
-              decoration: BoxDecoration(
-                  color: MyColors.brown,
-                  borderRadius: BorderRadius.circular(16)),
-              child: const Center(
-                child: Text(
-                  'Get Started',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
+          BlocBuilder<AppCubit, AppState>(
+            builder: (context, state) {
+              return GestureDetector(
+                onTap: () {
+                  context.read<AppCubit>().chechUserLoginStatus(context);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 24, left: 23, top: 24),
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: MyColors.brown,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Get Started',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           )
         ],
       ),

@@ -7,12 +7,14 @@ class AppState extends Equatable {
   final bool showLikeAnim;
   final bool isLoading;
   final CoffeeModelRM coffeeItem;
+  final bool userLoggedIn;
   const AppState(
       {required this.currentIndex,
       required this.coffeeList,
       required this.showLikeAnim,
       required this.isLoading,
-      required this.coffeeItem});
+      required this.coffeeItem,
+      required this.userLoggedIn});
 
   AppState copyWith({
     int? currentIndex,
@@ -21,16 +23,24 @@ class AppState extends Equatable {
     int? likedItemIndex,
     bool? isLoading,
     CoffeeModelRM? coffeeItem,
+    bool? userLoggedIn,
   }) {
     return AppState(
         currentIndex: currentIndex ?? this.currentIndex,
         coffeeList: coffeeList ?? this.coffeeList,
         showLikeAnim: showLikeAnim ?? this.showLikeAnim,
         isLoading: isLoading ?? this.isLoading,
-        coffeeItem: coffeeItem ?? this.coffeeItem);
+        coffeeItem: coffeeItem ?? this.coffeeItem,
+        userLoggedIn: userLoggedIn ?? this.userLoggedIn);
   }
 
   @override
-  List<Object?> get props =>
-      [currentIndex, coffeeList, showLikeAnim, isLoading,coffeeItem];
+  List<Object?> get props => [
+        currentIndex,
+        coffeeList,
+        showLikeAnim,
+        isLoading,
+        coffeeItem,
+        userLoggedIn
+      ];
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/cubit/cubit/app_state.dart';
 import 'package:flutter_coffee/models/coffee_model_rm.dart';
-import 'package:flutter_coffee/screens/order_screen.dart';
 import 'package:flutter_coffee/screens/widgets/app_bar.dart';
 import 'package:flutter_coffee/screens/widgets/loading_widget.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
@@ -48,7 +46,6 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: BlocBuilder<AppCubit, AppState>(
                   builder: (context, state) {
                     final CoffeeModelRM coffeeItem = state.coffeeItem;
-                    print("${state.coffeeItem.image}kkkk");
                     return Column(
                       children: [
                         Container(
@@ -390,14 +387,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                OrderListScreen(
-                                              coffeeId: coffeeItem.id!.toInt(),
-                                            ),
-                                          )),
+                                      onTap: () => context
+                                          .read<AppCubit>()
+                                          .addItemToCart(
+                                              coffeeItem.id!, context),
                                       child: Container(
                                         margin: const EdgeInsets.only(left: 40),
                                         height: 60,
@@ -431,7 +424,7 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
           BlocBuilder<AppCubit, AppState>(
             builder: (context, state) {
-              return const LoadingWidget();
+              return state.isLoading ? const LoadingWidget() : Container();
             },
           )
         ],

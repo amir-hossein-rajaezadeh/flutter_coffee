@@ -1,8 +1,9 @@
- import 'package:flutter_coffee/models/coffee_model_rm.dart';
+import 'package:flutter_coffee/models/coffee_model_rm.dart';
+import 'package:flutter_coffee/models/login_model_rm.dart';
+import 'package:flutter_coffee/models/register_rm.dart';
 import 'package:flutter_coffee/utils/app_constants.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
-
 
 part 'rest_client.g.dart';
 
@@ -13,20 +14,19 @@ abstract class CoffeeClient {
   @GET(AppConstants.coffees)
   Future<List<CoffeeModelRM>> getCoffeeList();
 
-  // @MultiPart()
-  // @POST('${AppConstants.movies}multi/')
-  // Future<MovieRM> postNewMovie(@Body() FormData param);
+  @POST(AppConstants.login)
+  Future<LoginModelRM> login(
+    @Query('username') String username,
+    @Query('password') String password,
+  );
+
+  @POST(AppConstants.register)
+  Future<RegisterRM> register(@Body() Map<String, dynamic> body);
 
   @GET('${AppConstants.coffees}/{id}')
   Future<CoffeeModelRM> getCoffeeDetail(@Path("id") id);
 
-  // @GET('${AppConstants.genres}{id}/${AppConstants.movies}')
-  // Future<MovieModelRM> getMovieListByGenreId(
-  //   @Path("id") id,
-  //   @Query('page') int page,
-  // );
-
-  // @GET(AppConstants.genres)
-  // Future<List<GenresRM>> getGenresList();
-
+  @POST(AppConstants.cart)
+  Future<dynamic> addItemToCart(
+        @Header("Authorization") String token, @Body() Map<String, dynamic> body);
 }
