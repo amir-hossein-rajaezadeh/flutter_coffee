@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/cubit/cubit/app_state.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
- 
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -11,8 +11,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      body: ListView(
         children: [
           Container(
             width: double.infinity,

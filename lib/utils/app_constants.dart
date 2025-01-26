@@ -4,6 +4,8 @@ class AppConstants {
   static const login = 'login';
   static const register = 'account/';
   static const cart = 'cart/';
+    static const like = 'like/';
+
 
   
 }

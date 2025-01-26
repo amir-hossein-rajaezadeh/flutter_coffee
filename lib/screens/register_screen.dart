@@ -26,7 +26,9 @@ class RegisterScreen extends StatelessWidget {
           Column(
             children: [
               const BuildAppBarWidget(
-                  appBarTitle: "Register", hasActionIcon: false),
+                  showBackButton: true,
+                  appBarTitle: "Register",
+                  hasActionIcon: false),
               Container(
                 margin: const EdgeInsets.only(top: 20, right: 26, left: 26),
                 child: TextFormField(
@@ -86,7 +88,6 @@ class RegisterScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
               GestureDetector(
                 onTap: () => context.read<AppCubit>().registerUser(
                     _usernameTextEditingController.text,

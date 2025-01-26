@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
@@ -16,8 +18,8 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
-  final LatLng coffeeLocation = LatLng(40.6859, -73.9802);
-  final LatLng homeLocation = LatLng(40.687983761053765, -73.9787030889008);
+  late LatLng coffeeLocation;
+  late LatLng homeLocation;
   final MapController _mapController = MapController();
   List<LatLng> route = [];
   LatLng? animatedBikePosition;
@@ -29,6 +31,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    coffeeLocation = context.read<AppCubit>().getCoffeeLocation();
+    homeLocation =
+        context.read<AppCubit>().getHomeLocation(coffeeLocation, moveUp: true);
     _getRoute();
 
     _animationController = AnimationController(
@@ -51,7 +56,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     });
 
     _animationController.addStatusListener((status) {
-      
       if (status == AnimationStatus.completed &&
           currentPointIndex < route.length - 1) {
         currentPointIndex++;
@@ -193,7 +197,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () =>context.pop() ,
+            onTap: () => context.pop(),
             child: Container(
               width: 44,
               height: 44,

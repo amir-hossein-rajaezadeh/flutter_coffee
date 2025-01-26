@@ -11,6 +11,7 @@ class CoffeeModelRM {
   int? _buyCount;
   String? _coffeeShopLocation;
   String? _coffeeAddress;
+  String? _coffeeSize;
 
   CoffeeModelRM(
       {int? id,
@@ -24,6 +25,7 @@ class CoffeeModelRM {
       String? desc,
       int? buyCount,
       String? coffeeShopLocation,
+      String? coffeeSize,
       String? coffeeAddress}) {
     if (id != null) {
       _id = id;
@@ -61,6 +63,9 @@ class CoffeeModelRM {
     if (coffeeAddress != null) {
       _coffeeAddress = coffeeAddress;
     }
+    if (coffeeSize != null) {
+      coffeeSize = coffeeSize;
+    }
   }
 
   int? get id => _id;
@@ -88,10 +93,14 @@ class CoffeeModelRM {
       _coffeeShopLocation = coffeeShopLocation;
   String? get coffeeAddress => _coffeeAddress;
   set coffeeAddress(String? coffeeAddress) => _coffeeAddress = coffeeAddress;
+  String? get coffeeSize => _coffeeSize;
+  set coffeeSize(String? coffeeSize) => _coffeeSize = coffeeSize;
 
   CoffeeModelRM.fromJson(Map<String, dynamic> json) {
     _id = json['id'];
     _coffeeName = json['coffeeName'];
+    _coffeeSize = json['coffeeSize'];
+
     _coffeeType = json['coffeeType'];
     _rate = json['rate'];
     _commentCount = json['commentCount'];
@@ -122,6 +131,8 @@ class CoffeeModelRM {
     data['buyCount'] = _buyCount;
     data['coffeeShopLocation'] = _coffeeShopLocation;
     data['coffeeAddress'] = _coffeeAddress;
+    data['coffeeSize'] = _coffeeSize;
+
     return data;
   }
 }

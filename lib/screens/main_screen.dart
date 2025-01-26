@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/models/coffee_model_rm.dart';
+import 'package:flutter_coffee/screens/widgets/app_drawer.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
 import 'package:go_router/go_router.dart';
 import '../cubit/cubit/app_state.dart';
@@ -20,73 +22,81 @@ class _MainScreenState extends State<MainScreen> {
   int selectedNavBarIndex = 0;
   @override
   void initState() {
-    context.read<AppCubit>().getCoffeeList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    context.read<AppCubit>().getCoffeeList();
+
     return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-            onTap: (value) {
-              setState(() {
-                selectedNavBarIndex = value;
-              });
-            },
-            iconSize: 28,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: selectedNavBarIndex,
-            selectedItemColor: MyColors.brown,
-            unselectedItemColor: MyColors.lightGrey,
-            selectedFontSize: 0,
-            items: [
-              const BottomNavigationBarItem(
-                  icon: Icon(
-                    CupertinoIcons.house_fill,
-                  ),
-                  label: '',
-                  tooltip: 'Home'),
-              BottomNavigationBarItem(
+      drawer: const CustomDrawer(),
+      bottomNavigationBar: BottomNavigationBar(
+          onTap: (value) {
+            setState(() {
+              selectedNavBarIndex = value;
+            });
+          },
+          iconSize: 28,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: selectedNavBarIndex,
+          selectedItemColor: MyColors.brown,
+          unselectedItemColor: MyColors.lightGrey,
+          selectedFontSize: 0,
+          items: [
+            const BottomNavigationBarItem(
                 icon: Icon(
-                  selectedNavBarIndex == 1
-                      ? CupertinoIcons.suit_heart_fill
-                      : CupertinoIcons.suit_heart,
+                  CupertinoIcons.house_fill,
                 ),
                 label: '',
-                tooltip: 'Like',
+                tooltip: 'Home'),
+            BottomNavigationBarItem(
+              icon: Icon(
+                selectedNavBarIndex == 1
+                    ? CupertinoIcons.suit_heart_fill
+                    : CupertinoIcons.suit_heart,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  selectedNavBarIndex == 2
-                      ? Icons.shopping_bag
-                      : Icons.shopping_bag_outlined,
-                ),
-                label: '',
-                tooltip: 'Shop',
+              label: '',
+              tooltip: 'Like',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                selectedNavBarIndex == 2
+                    ? Icons.shopping_bag
+                    : Icons.shopping_bag_outlined,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  selectedNavBarIndex == 3
-                      ? CupertinoIcons.bell_fill
-                      : CupertinoIcons.bell,
-                ),
-                label: '',
-                tooltip: 'Notifications',
+              label: '',
+              tooltip: 'Shop',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                selectedNavBarIndex == 3
+                    ? CupertinoIcons.bell_fill
+                    : CupertinoIcons.bell,
               ),
-            ]),
-        body: selectedNavBarIndex == 0
-            ? _mainPage()
-            : selectedNavBarIndex == 1
-                ? const Center(
-                    child: Text('Likes'),
-                  )
-                : (selectedNavBarIndex == 2)
-                    ? const Center(
-                        child: Text('Shop'),
-                      )
-                    : const Center(
-                        child: Text('Notifications'),
-                      ));
+              label: '',
+              tooltip: 'Notifications',
+            ),
+          ]),
+      body: selectedNavBarIndex == 0
+          ? _mainPage()
+          : selectedNavBarIndex == 1
+              ? const Center(
+                  child: Text('Likes'),
+                )
+              : (selectedNavBarIndex == 2)
+                  ? const Center(
+                      child: Text('Shop'),
+                    )
+                  : Center(
+                      child: TextButton(
+                        onPressed: () {
+                          context.read<AppCubit>().logout(context);
+                        },
+                        child: const Text('Logout'),
+                      ),
+                    ),
+    );
   }
 
   BlocBuilder<AppCubit, AppState> _mainPage() {
@@ -193,18 +203,23 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                margin: const EdgeInsets.only(right: 24),
-                                width: 62,
-                                height: 62,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: MyColors.brown),
-                                child: Center(
-                                  child: Image.asset(
-                                    'assets/icons/config.png',
-                                    fit: BoxFit.cover,
-                                    height: 32,
+                              GestureDetector(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 24),
+                                  width: 62,
+                                  height: 62,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: MyColors.brown),
+                                  child: Center(
+                                    child: Image.asset(
+                                      'assets/icons/config.png',
+                                      fit: BoxFit.cover,
+                                      height: 32,
+                                    ),
                                   ),
                                 ),
                               )
@@ -345,7 +360,8 @@ class _MainScreenState extends State<MainScreen> {
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                   child: Image.network(
-                                                    coffeeItem.image!,
+                                                    coffeeItem.image ??
+                                                        "https://media.istockphoto.com/id/1334419989/photo/3d-red-question-mark.jpg?s=612x612&w=0&k=20&c=bpaGVuyt_ACui3xK8CvkeoVQC-jczxANZTMXGKAE11E=",
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),

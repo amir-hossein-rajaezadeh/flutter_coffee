@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
@@ -20,10 +21,13 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
+          ListView(
+            padding: const EdgeInsets.only(top: 0),
             children: [
               const BuildAppBarWidget(
-                  appBarTitle: "Login", hasActionIcon: false),
+                  showBackButton: false,
+                  appBarTitle: "Login",
+                  hasActionIcon: false),
               Container(
                 margin: const EdgeInsets.only(top: 20, right: 26, left: 26),
                 child: TextFormField(
@@ -53,7 +57,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
               GestureDetector(
                 onTap: () => context.read<AppCubit>().loginUser(
                     _usernameTextEditingController.text,
@@ -61,7 +64,7 @@ class LoginScreen extends StatelessWidget {
                     context),
                 child: Container(
                   margin: const EdgeInsets.only(
-                      top: 400, right: 28, left: 28, bottom: 0),
+                      top: 30, right: 28, left: 28, bottom: 3),
                   height: 55,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),

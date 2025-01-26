@@ -5,6 +5,7 @@ import 'package:flutter_coffee/cubit/cubit/app_cubit.dart';
 import 'package:flutter_coffee/cubit/cubit/app_state.dart';
 import 'package:flutter_coffee/models/coffee_model_rm.dart';
 import 'package:flutter_coffee/screens/widgets/app_bar.dart';
+import 'package:flutter_coffee/screens/widgets/coffee_size.dart';
 import 'package:flutter_coffee/screens/widgets/loading_widget.dart';
 import 'package:flutter_coffee/utils/my_colors.dart';
 
@@ -21,9 +22,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   void initState() {
-    context.read<AppCubit>().getCoffeeDetail(
-          widget.coffeeId.toInt(),
-        );
+    context.read<AppCubit>()
+      ..getCoffeeDetail(
+        widget.coffeeId.toInt(),
+      )
+      ..setupInterceptors(context);
 
     super.initState();
   }
@@ -39,6 +42,7 @@ class _DetailScreenState extends State<DetailScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               const BuildAppBarWidget(
+                showBackButton: true,
                 appBarTitle: 'Detail',
                 hasActionIcon: true,
               ),
@@ -46,6 +50,8 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: BlocBuilder<AppCubit, AppState>(
                   builder: (context, state) {
                     final CoffeeModelRM coffeeItem = state.coffeeItem;
+                    print("sssss ${coffeeItem.image}");
+
                     return Column(
                       children: [
                         Container(
@@ -54,7 +60,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
-                              coffeeItem.image ?? '',
+                              coffeeItem.image ??
+                                  "http://0.0.0.0:8765/uploads/Items.png",
                               width: 400,
                               height: 200,
                               fit: BoxFit.fitWidth,
@@ -78,9 +85,14 @@ class _DetailScreenState extends State<DetailScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    coffeeItem.coffeeType ?? "",
-                                    style: const TextStyle(
-                                        color: MyColors.lightGrey),
+                                    coffeeItem.coffeeType ?? "Unknown",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: coffeeItem.coffeeType == "Hot"
+                                          ? Colors.red.withOpacity(0.8)
+                                          : Colors.blue.withOpacity(0.9),
+                                    ),
                                   ),
                                   Container(
                                     child: Row(
@@ -199,142 +211,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => setState(() {
-                                              selectedCoffeeSize = 0;
-                                            }),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 170),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: selectedCoffeeSize == 0
-                                                    ? MyColors.brown
-                                                        .withOpacity(0.2)
-                                                    : Colors.white,
-                                                border: Border.all(
-                                                    width: 1.6,
-                                                    color: selectedCoffeeSize ==
-                                                            0
-                                                        ? MyColors.brown
-                                                        : MyColors.lightGrey),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 50,
-                                                        vertical: 10),
-                                                child: Center(
-                                                  child: Text(
-                                                    'S',
-                                                    style: TextStyle(
-                                                        color:
-                                                            selectedCoffeeSize ==
-                                                                    0
-                                                                ? MyColors.brown
-                                                                : Colors.black,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => setState(() {
-                                              selectedCoffeeSize = 1;
-                                            }),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 170),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: selectedCoffeeSize == 1
-                                                    ? MyColors.brown
-                                                        .withOpacity(0.2)
-                                                    : Colors.white,
-                                                border: Border.all(
-                                                    width: 1.6,
-                                                    color: selectedCoffeeSize ==
-                                                            1
-                                                        ? MyColors.brown
-                                                        : MyColors.lightGrey),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 50,
-                                                        vertical: 10),
-                                                child: Center(
-                                                  child: Text(
-                                                    'M',
-                                                    style: TextStyle(
-                                                        color:
-                                                            selectedCoffeeSize ==
-                                                                    1
-                                                                ? MyColors.brown
-                                                                : Colors.black,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => setState(() {
-                                              selectedCoffeeSize = 2;
-                                            }),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 170),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: selectedCoffeeSize == 2
-                                                    ? MyColors.brown
-                                                        .withOpacity(0.2)
-                                                    : Colors.white,
-                                                border: Border.all(
-                                                    width: 1.6,
-                                                    color: selectedCoffeeSize ==
-                                                            2
-                                                        ? MyColors.brown
-                                                        : MyColors.lightGrey),
-                                              ),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 50,
-                                                        vertical: 10),
-                                                child: Center(
-                                                  child: Text(
-                                                    'L',
-                                                    style: TextStyle(
-                                                        color:
-                                                            selectedCoffeeSize ==
-                                                                    2
-                                                                ? MyColors.brown
-                                                                : Colors.black,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                    CoffeeSizeWidget(
+                                      initValue: int.parse(
+                                          coffeeItem.coffeeSize ?? "0"),
                                     )
                                   ],
                                 ),
@@ -390,7 +269,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                       onTap: () => context
                                           .read<AppCubit>()
                                           .addItemToCart(
-                                              coffeeItem.id!, context),
+                                              coffeeItem.id!, 1, context),
                                       child: Container(
                                         margin: const EdgeInsets.only(left: 40),
                                         height: 60,

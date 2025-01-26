@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,6 +34,14 @@ class SecureStorageService {
     final token = await _secureStorage.read(key: _accessTokenKey);
     print('Access token securely read: $token');
     return token;
+  }
+
+  Future<String?> readAllData(String key) async {
+    if (kIsWeb) {
+      return await readData(key);
+    } else {
+      return await readAccessTokenSecure();
+    }
   }
 
   // Read Refresh Token (Secure)
